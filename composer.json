@@ -12,6 +12,8 @@
     ],
     "require": {
         "php": "^8.0",
+        "ext-mysqli": "*",
+        "ext-openssl": "*",
         "ext-curl": "*",
         "ext-dom": "*",
         "ext-fileinfo": "*",

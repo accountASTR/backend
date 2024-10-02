@@ -17,4 +17,18 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    #disable directory browsing
+    Options Indexes
+
+    #PROTECT ENV FILE 
+    <Files.env> Order allow, deny 
+    Deny from all
+    </Files>
+
+    #PROTECT ENV FILE
+    <Files .htaccess> Order allow, deny
+    Deny from all 
+    </Files>
+    
 </IfModule>

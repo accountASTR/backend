@@ -53,7 +53,8 @@
         "srmklive/paypal": "^3.0",
         "stripe/stripe-php": "^10.6",
         "twilio/sdk": "^6.40",
-        "vonage/client": "^3.0"
+        "vonage/client": "^3.0",
+        "doctrine/dbal": "^3.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
@@ -106,6 +107,7 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "process-timeout": 600,
         "allow-plugins": {
             "php-http/discovery": true
         }

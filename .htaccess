@@ -1,8 +1,9 @@
-<!-- # Uncomment this only if you need to redirect all traffic to the public directory
-# <IfModule mod_rewrite.c>
-#    RewriteEngine On
-#    RewriteRule ^(.*)$ public/$1 [L]
-# </IfModule> -->
+<IfModule mod_rewrite.c>
+   RewriteEngine On
+   RewriteBase /
+   RewriteRule ^public/(.*)$ public/$1 [L]
+   RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
 
 <Files ".env">
    Order allow,deny

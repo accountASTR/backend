@@ -10,6 +10,27 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
+
+
+
+// namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class DataController extends Controller
+{
+    public function getData()
+    {
+        // Sample data for testing
+        return response()->json(['message' => 'Hello from Laravel!']);
+    }
+}
+
+
+
+
+
+
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;

@@ -5,6 +5,7 @@ use App\Http\Controllers\API\v1\{GalleryController, LikeController, PushNotifica
 use App\Http\Controllers\API\v1\Auth\{LoginController, RegisterController, VerifyAuthController};
 use App\Http\Controllers\API\v1\Dashboard\{Admin, Deliveryman, Payment, Seller, User};
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DataController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,10 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::get('/data', [DataController::class, 'getData']);
+
+
 Route::group(['prefix' => 'v1', 'middleware' => ['block.ip']], function () {
     // Methods without AuthCheck
     Route::post('/auth/register',                       [RegisterController::class, 'register'])

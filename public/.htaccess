@@ -18,6 +18,9 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 
+
+    
+
     #disable directory browsing
     Options Indexes
 

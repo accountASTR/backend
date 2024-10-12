@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://adminaztrproject-0ba7d5b16bef.herokuapp.com'],
+    'allowed_origins' => ['https://adminaztrproject-b332c3269318.herokuapp.com/'],
 
     'allowed_origins_patterns' => [],
 

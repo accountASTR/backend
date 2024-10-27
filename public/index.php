@@ -1,55 +1,39 @@
 <?php
 
-use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Http\Request;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Log\LoggerInterface;
+use DI\Container;
+use DI\Bridge\Slim\Bridge;
+use Monolog\Handler\StreamHandler;
+use Monolog\Level;
+use Monolog\Logger;
+use Slim\Factory\AppFactory;
+use Slim\Views\Twig;
 
-define ('LARAVEL_START', microtime(true));
+require(__DIR__.'/../vendor/autoload.php');
 
-/*
-|--------------------------------------------------------------------------
-| Check If The Application Is Under Maintenance
-|--------------------------------------------------------------------------
-|
-| If the application is in maintenance / demo mode via the "down" command
-| we will load this file so that any pre-rendered content can be shown
-| instead of starting the framework, which could cause an exception.
-|
-*/
+// Create DI container
+$container = new Container();
+// Add Twig to Container
+$container->set(Twig::class, function() {
+  return Twig::create(__DIR__.'/../views');
+});
+// Add Monolog to Container
+$container->set(LoggerInterface::class, function () {
+  $logger = new Logger('default');
+  $logger->pushHandler(new StreamHandler('php://stderr'), Level::Debug);
+  return $logger;
+});
 
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
-    require $maintenance;
-}
+// Create main Slim app
+$app = Bridge::create($container);
+$app->addErrorMiddleware(true, false, false);
 
-/*
-|--------------------------------------------------------------------------
-| Register The Auto Loader
-|--------------------------------------------------------------------------
-|
-| Composer provides a convenient, automatically generated class loader for
-| this application. We just need to utilize it! We'll simply require it
-| into the script here, so we don't need to manually load our classes.
-|
-*/
+// Our web handlers
+$app->get('/', function(Request $request, Response $response, LoggerInterface $logger, Twig $twig) {
+  $logger->debug('logging output.');
+  return $twig->render($response, 'index.twig');
+});
 
-require __DIR__.'/../vendor/autoload.php';
-
-/*
-|--------------------------------------------------------------------------
-| Run The Application
-|--------------------------------------------------------------------------
-|
-| Once we have the application, we can handle the incoming request using
-| the application's HTTP kernel. Then, we will send the response back
-| to this client's browser, allowing them to enjoy our application.
-|
-*/
-
-$app = require_once __DIR__.'/../bootstrap/app.php';
-
-$kernel = $app->make(Kernel::class);
-
-$response = $kernel->handle(
-    $request = Request::capture()
-)->send();
-
-$kernel->terminate($request, $response);
+$app->run();

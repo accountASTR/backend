@@ -2,8 +2,12 @@
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
+use Twig\Environment as Twig; // Make sure to import Twig correctly
+use PDO;
 
-define ('LARAVEL_START', microtime(true));
+define('LARAVEL_START', microtime(true));
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +20,7 @@ define ('LARAVEL_START', microtime(true));
 |
 */
 
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+if (file_exists($maintenance = __DIR__ . '/../storage/framework/maintenance.php')) {
     require $maintenance;
 }
 
@@ -31,8 +35,7 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 |
 */
 
-// require __DIR__.'/../vendor/autoload.php';
-require(__DIR__.'/../vendor/autoload.php');
+require __DIR__ . '/../vendor/autoload.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -45,12 +48,40 @@ require(__DIR__.'/../vendor/autoload.php');
 |
 */
 
-$app = require_once __DIR__.'/../bootstrap/app.php';
+// Require the app
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 
+// Add Database connection to Container
+$app->singleton(PDO::class, function () {
+    $dburl = parse_url(getenv('DATABASE_URL') ?: throw new Exception('no DATABASE_URL'));
+
+    return new PDO(sprintf(
+        "pgsql:host=%s;port=%s;dbname=%s;user=%s;password=%s",
+        $dburl['host'],
+        $dburl['port'],
+        ltrim($dburl['path'], '/'), // URL path is the DB name, must remove leading slash
+        $dburl['user'],
+        $dburl['pass']
+    ));
+});
+
+// Define the route
+$app->get('/db', function (Request $request, LoggerInterface $logger, Twig $twig, PDO $pdo) {
+    $st = $pdo->prepare('SELECT name FROM test_table');
+    $st->execute();
+    $names = [];
+
+    while ($row = $st->fetch(PDO::FETCH_ASSOC)) {
+        $logger->debug('Row ' . $row['name']);
+        $names[] = $row;
+    }
+
+    return $twig->render('database.twig', [
+        'names' => $names,
+    ]);
+});
+
+// Handle the incoming request
 $kernel = $app->make(Kernel::class);
-
-$response = $kernel->handle(
-    $request = Request::capture()
-)->send();
-
+$response = $kernel->handle($request = Request::capture())->send();
 $kernel->terminate($request, $response);
